@@ -44,8 +44,7 @@ extension $Platform on Platform {
 }
 
 extension $WidgetRef on WidgetRef {
-  setTheme(BuildContext context) =>
-      read(themeProvider.notifier).setTheme(context);
+  setTheme(BuildContext context) => read(themeProvider.notifier).setTheme();
   loadlogs() => read(stateProvider.notifier).loadLogs();
   onIsActivityChanged(String dns) =>
       read(stateProvider.notifier).onIsActive(dns);

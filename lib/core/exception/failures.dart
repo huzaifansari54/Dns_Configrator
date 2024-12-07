@@ -13,7 +13,6 @@ class Failures {
   @override
   int get hashCode => failure.hashCode;
   @override
-  bool operator ==(covariant Failures other) {
-    return other.failure == failure ? other.hashCode == hashCode : false;
-  }
+  bool operator ==(covariant Failures other) =>
+      other.failure == failure && other.hashCode == hashCode;
 }

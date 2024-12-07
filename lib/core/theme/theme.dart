@@ -11,8 +11,5 @@ final themeProvider =
 class ThemeBloc extends StateNotifier<ThemeState> {
   ThemeBloc() : super(ThemeState.light());
 
-  setTheme(BuildContext context) => switch (context.getTheme()) {
-        Brightness.dark => state = state.copyWith(isDark: true),
-        Brightness.light => state = state.copyWith(isDark: false)
-      };
+  setTheme() => state = state.copyWith(isDark: !(state.isDark));
 }
