@@ -1,12 +1,18 @@
 import 'package:dns_configurator/core/exception/failures.dart';
 import 'package:dns_configurator/core/exception/platform_exception.dart';
+import 'package:dns_configurator/features/dns_configuration/model/model.dart';
 import 'package:dns_configurator/features/dns_configuration/platform_interface/platform_impl.dart';
+import 'package:dns_configurator/features/logger/logger.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
-
+import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'platform/mock_platform.dart';
 
+// mock class
+
 void main() {
+  const dns = "8.8.8.8";
   late final UnspporetePlatform unspporetePlatform;
   late final MockAndroidPlatform mockAndroidPlatform;
   late final MockMacPlatform mockMacPlatform;
@@ -17,21 +23,28 @@ void main() {
   late final PlatformImpl macplatformImpl;
   late final PlatformImpl windowsplatformImpl;
   late final PlatformImpl linuxlatformImpl;
-  setUpAll(() {
+  late final SharedPreferences mockSharedPreferences;
+  late final ILogger logger;
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues({});
+    mockSharedPreferences = await SharedPreferences.getInstance();
+    logger = MockLogger();
     unspporetePlatform = UnspporetePlatform();
     mockAndroidPlatform = MockAndroidPlatform();
     mockWindowsPlatform = MockWindowsPlatform();
     mockLinuxPlatform = MockLinuxPlatform();
     mockMacPlatform = MockMacPlatform();
-    windowsplatformImpl = PlatformImpl.fromPlatForm(mockWindowsPlatform);
-    macplatformImpl = PlatformImpl.fromPlatForm(mockMacPlatform);
-    linuxlatformImpl = PlatformImpl.fromPlatForm(mockLinuxPlatform);
-    platformImpl = PlatformImpl.fromPlatForm(unspporetePlatform);
-    androidplatformImpl = PlatformImpl.fromPlatForm(mockAndroidPlatform);
+    windowsplatformImpl =
+        PlatformImpl.fromPlatForm(mockWindowsPlatform, logger);
+    macplatformImpl = PlatformImpl.fromPlatForm(mockMacPlatform, logger);
+    linuxlatformImpl = PlatformImpl.fromPlatForm(mockLinuxPlatform, logger);
+    platformImpl = PlatformImpl.fromPlatForm(unspporetePlatform, logger);
+    androidplatformImpl =
+        PlatformImpl.fromPlatForm(mockAndroidPlatform, logger);
   });
   group(' Unknow Platform specific tests', () {
     test('Unsupport platform test', () async {
-      final resultOrFailure = await platformImpl.modifiyDNS().run();
+      final resultOrFailure = await platformImpl.modifiyDNS(dns: dns).run();
       final failres = resultOrFailure
           .getLeft()
           .getOrElse(() => Failures.unknow("UnknowError"));
@@ -42,7 +55,8 @@ void main() {
   group('Android Platform specific tests', () {
     test('Android platform failure  test', () async {
       mockAndroidPlatform.setError = true;
-      final resultOrFailure = await androidplatformImpl.modifiyDNS().run();
+      final resultOrFailure =
+          await androidplatformImpl.modifiyDNS(dns: dns).run();
       final failres = resultOrFailure
           .getLeft()
           .getOrElse(() => Failures.unknow("UnknowError"));
@@ -53,7 +67,8 @@ void main() {
     });
     test('Android platform unknowfailure  test', () async {
       mockAndroidPlatform.setUnknowError = true;
-      final resultOrFailure = await androidplatformImpl.modifiyDNS().run();
+      final resultOrFailure =
+          await androidplatformImpl.modifiyDNS(dns: dns).run();
       final failres = resultOrFailure
           .getLeft()
           .getOrElse(() => Failures.unknow("UnknowError"));
@@ -65,7 +80,8 @@ void main() {
       mockAndroidPlatform.setError = false;
       mockAndroidPlatform.setUnknowError = false;
 
-      final resultOrFailure = await androidplatformImpl.modifiyDNS().run();
+      final resultOrFailure =
+          await androidplatformImpl.modifiyDNS(dns: dns).run();
       final success = resultOrFailure.getOrElse((_) => unit);
       expect(resultOrFailure, isA<Right<Failures, Unit>>());
       expect(success, isA<Unit>());
@@ -74,7 +90,7 @@ void main() {
   group('MacPlatform specific tests', () {
     test('Mac platform failure  test', () async {
       mockMacPlatform.setError = true;
-      final resultOrFailure = await macplatformImpl.modifiyDNS().run();
+      final resultOrFailure = await macplatformImpl.modifiyDNS(dns: dns).run();
       final failres = resultOrFailure
           .getLeft()
           .getOrElse(() => Failures.unknow("UnknowError"));
@@ -84,7 +100,7 @@ void main() {
     });
     test('Mac platform unknowfailure  test', () async {
       mockMacPlatform.setUnknowError = true;
-      final resultOrFailure = await macplatformImpl.modifiyDNS().run();
+      final resultOrFailure = await macplatformImpl.modifiyDNS(dns: dns).run();
       final failres = resultOrFailure
           .getLeft()
           .getOrElse(() => Failures.unknow("UnknowError"));
@@ -96,7 +112,7 @@ void main() {
       mockMacPlatform.setError = false;
       mockMacPlatform.setUnknowError = false;
 
-      final resultOrFailure = await macplatformImpl.modifiyDNS().run();
+      final resultOrFailure = await macplatformImpl.modifiyDNS(dns: dns).run();
       final success = resultOrFailure.getOrElse((_) => unit);
       expect(resultOrFailure, isA<Right<Failures, Unit>>());
       expect(success, isA<Unit>());
@@ -105,7 +121,8 @@ void main() {
   group('WindowsPlatform specific tests', () {
     test('Windows platform failure test', () async {
       mockWindowsPlatform.setError = true;
-      final resultOrFailure = await windowsplatformImpl.modifiyDNS().run();
+      final resultOrFailure =
+          await windowsplatformImpl.modifiyDNS(dns: dns).run();
       final failres = resultOrFailure
           .getLeft()
           .getOrElse(() => Failures.unknow("UnknowError"));
@@ -115,7 +132,8 @@ void main() {
     });
     test('Windows platform unknowfailure  test', () async {
       mockWindowsPlatform.setUnknowError = true;
-      final resultOrFailure = await windowsplatformImpl.modifiyDNS().run();
+      final resultOrFailure =
+          await windowsplatformImpl.modifiyDNS(dns: dns).run();
       final failres = resultOrFailure
           .getLeft()
           .getOrElse(() => Failures.unknow("UnknowError"));
@@ -127,7 +145,8 @@ void main() {
       mockWindowsPlatform.setError = false;
       mockWindowsPlatform.setUnknowError = false;
 
-      final resultOrFailure = await windowsplatformImpl.modifiyDNS().run();
+      final resultOrFailure =
+          await windowsplatformImpl.modifiyDNS(dns: dns).run();
       final success = resultOrFailure.getOrElse((_) => unit);
       expect(resultOrFailure, isA<Right<Failures, Unit>>());
       expect(success, isA<Unit>());
@@ -136,7 +155,7 @@ void main() {
   group('LinuxPlatform specific tests', () {
     test('Linux platform failure  test', () async {
       mockLinuxPlatform.setError = true;
-      final resultOrFailure = await linuxlatformImpl.modifiyDNS().run();
+      final resultOrFailure = await linuxlatformImpl.modifiyDNS(dns: dns).run();
       final failres = resultOrFailure
           .getLeft()
           .getOrElse(() => Failures.unknow("UnknowError"));
@@ -146,7 +165,7 @@ void main() {
     });
     test('Linux platform unknowfailure  test', () async {
       mockLinuxPlatform.setUnknowError = true;
-      final resultOrFailure = await linuxlatformImpl.modifiyDNS().run();
+      final resultOrFailure = await linuxlatformImpl.modifiyDNS(dns: dns).run();
       final failres = resultOrFailure
           .getLeft()
           .getOrElse(() => Failures.unknow("UnknowError"));
@@ -158,7 +177,7 @@ void main() {
       mockLinuxPlatform.setError = false;
       mockLinuxPlatform.setUnknowError = false;
 
-      final resultOrFailure = await linuxlatformImpl.modifiyDNS().run();
+      final resultOrFailure = await linuxlatformImpl.modifiyDNS(dns: dns).run();
       final success = resultOrFailure.getOrElse((_) => unit);
       expect(resultOrFailure, isA<Right<Failures, Unit>>());
       expect(success, isA<Unit>());

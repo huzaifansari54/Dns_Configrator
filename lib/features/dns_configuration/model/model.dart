@@ -23,4 +23,10 @@ abstract class DnsModel with _$DnsModel {
       dsaAddress: json["dsaAddress"],
       timesTamps: json["timesTamps"],
       isActive: json["isActive"] ?? false);
+
+  @visibleForTesting
+  factory DnsModel.forTest(String dns) => DnsModel(
+      dsaAddress: dns,
+      timesTamps: DateTime.now().toDateTime(),
+      isActive: false);
 }

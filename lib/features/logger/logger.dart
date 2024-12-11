@@ -33,7 +33,7 @@ class Logger implements ILogger {
   @override
   IOEither<Failures, Unit> toogle(String dns) {
     return IOEither.tryCatch(
-            () => _toogle(dns), (e, _) => Failures.unknow("error from "))
+            () => _toogle(dns), (e, _) => Failures.unknow("error from toggle"))
         .map((e) => unit);
   }
 

@@ -1,3 +1,5 @@
+import 'package:dns_configurator/features/dns_configuration/model/model.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dns_configurator/features/logger/logger.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,12 +25,13 @@ void main() {
       final logs = logger.getLogs();
       expect(true, logs.isEmpty);
     });
-    test("get logs List is empty", () {
+    test("get logs List is empty", () async {
       when(
         () => mockShredPrefrenss.getStringList(MockShredPrefrenss.KEY),
       ).thenAnswer((_) => []);
-      final logs = logger.getLogs();
-      expect(true, logs.isEmpty);
+      final logs =
+          await logger.log(dnsModel: DnsModel.forTest("8.8.8.7")).run();
+      expect(logs, isA<Right>());
     });
   });
 }
