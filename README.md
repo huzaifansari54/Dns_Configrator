@@ -17,3 +17,7 @@ change dns through vpn in android
 
 ## Tests 
 i writes all Unit test in test module kindly check 
+test link : https://github.com/huzaifansari54/Dns_Configrator/tree/main/test
+
+## Sample Example 
+here is video link https://github.com/huzaifansari54/Dns_Configrator/blob/main/Android%20Emulator%20-%20flutter_emulator_5554%202024-12-11%2015-59-51.mp4
