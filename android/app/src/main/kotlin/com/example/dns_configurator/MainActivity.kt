@@ -1,4 +1,5 @@
-package com.example.quran_motivation
+package com.example.dns_configurator
+
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -26,8 +27,12 @@ import kotlinx.coroutines.launch
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.OutputStream
+import java.net.DatagramSocket
+import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.SocketAddress
 import java.nio.ByteBuffer
+import java.nio.channels.DatagramChannel
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
@@ -173,20 +178,28 @@ public class MyVpnServices() : VpnService() {
   private  fun readDataFromInterface(){
       isRunnig=true
       val bytes:ByteBuffer= ByteBuffer.allocate(1024)
+      val channel:DatagramChannel=DatagramChannel.open();
+      channel.socket().bind(InetSocketAddress(ServerIp,SetverPort))
       while (isRunnig){
 
           try {
 
          val file:FileInputStream =FileInputStream(vpnInterface!!.fileDescriptor)
          val  size:Int=file.read(bytes.array())
+
               if(size>0){
+                  bytes.clear()
                   val recivedData= String(bytes.array(),0,size)
                   val intent:Intent=Intent(my_action)
                   intent.putExtra("data",recivedData)
                   sendBroadcast(intent)//
                   // convert recived data into byte array
+
+
                   val buffer=ByteBuffer.wrap(recivedData.toByteArray())
-                  writeToNetwork(buffer,size)
+                  val clientAddress=channel.receive(buffer)
+                  buffer.flip()
+                  writeToNetwork(buffer,size,channel,clientAddress)
 
               }
 
@@ -198,21 +211,18 @@ public class MyVpnServices() : VpnService() {
 
   }
 
-    private  fun writeToNetwork(bytes:ByteBuffer,size:Int){
+    private  fun writeToNetwork(bytes:ByteBuffer,size:Int,channel: DatagramChannel,clientAddress:SocketAddress){
       try {
           // get the data in format of string so i can get exact size of packet data
           val data:String=String(bytes.array(),0, size)
           // create socket
-          val socket:Socket=Socket(ServerIp,SetverPort)
+
           // encode data into utf_8 format and convert it into byteArray
           val bytesArray:ByteArray=data.toByteArray(Charsets.UTF_8)
+          val buffer=ByteBuffer.wrap(bytesArray)
           // get output stream from socket to write the data into socket
-          val  outputSream:OutputStream=
-              socket.getOutputStream()
-          outputSream.write(bytesArray)
-          /// closed stream and socket
-          outputSream.close()
-          socket.close()
+
+         channel.send(buffer,clientAddress)
       }catch (e:IOException){
           Log.e(TAG,"Error while write to network "+e.message)
 

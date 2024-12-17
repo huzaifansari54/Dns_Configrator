@@ -1,1 +1,0 @@
- E:\\Zaif\ work\\flutterProject\\dns_configurator\\.dart_tool\\flutter_build\\0720a6e0486cc336eb6bb96f3d3d7227\\native_assets.yaml: 

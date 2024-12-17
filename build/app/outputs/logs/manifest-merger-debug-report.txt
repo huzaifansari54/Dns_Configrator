@@ -83,10 +83,6 @@ uses-permission#android.permission.ACCESS_WIFI_STATE
 ADDED from E:\Zaif work\flutterProject\dns_configurator\android\app\src\main\AndroidManifest.xml:4:5-76
 	android:name
 		ADDED from E:\Zaif work\flutterProject\dns_configurator\android\app\src\main\AndroidManifest.xml:4:22-73
-uses-permission#android.permission.CHANGE_WIFI_STATE
-ADDED from E:\Zaif work\flutterProject\dns_configurator\android\app\src\main\AndroidManifest.xml:5:5-76
-	android:name
-		ADDED from E:\Zaif work\flutterProject\dns_configurator\android\app\src\main\AndroidManifest.xml:5:22-73
 queries
 ADDED from E:\Zaif work\flutterProject\dns_configurator\android\app\src\main\AndroidManifest.xml:55:5-60:15
 intent#action:name:android.intent.action.PROCESS_TEXT+data:mimeType:text/plain
